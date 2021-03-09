@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"lenslocked.com/controllers"
 	"lenslocked.com/views"
 
 	"github.com/gorilla/mux"
@@ -11,7 +12,6 @@ import (
 var (
 	homeView    *views.View
 	contactView *views.View
-	signupView  *views.View
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -24,11 +24,6 @@ func contact(w http.ResponseWriter, r *http.Request) {
 	must(contactView.Render(w, nil))
 }
 
-func signup(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Contact-Type", "text/html")
-	must(signupView.Render(w, nil))
-}
-
 func must(err error) {
 	if err != nil {
 		panic(err)
@@ -38,11 +33,12 @@ func must(err error) {
 func main() {
 	homeView = views.NewView("bootstrap", "views/home.gohtml")
 	contactView = views.NewView("bootstrap", "views/contact.gohtml")
-	signupView = views.NewView("bootstrap", "views/signup.gohtml")
+	usersController := controllers.NewUsersController()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", home)
-	r.HandleFunc("/contact", contact)
-	r.HandleFunc("/signup", signup)
-	http.ListenAndServe(":3000", r)
+	r.HandleFunc("/", home).Methods("GET")
+	r.HandleFunc("/contact", contact).Methods("GET")
+	r.HandleFunc("/signup", usersController.New).Methods("GET")
+	r.HandleFunc("/signup", usersController.Create).Methods("POST")
+	http.ListenAndServe(":3214", r)
 }
