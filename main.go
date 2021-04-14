@@ -31,14 +31,13 @@ func must(err error) {
 }
 
 func main() {
-	homeView = views.NewView("bootstrap", "views/home.gohtml")
-	contactView = views.NewView("bootstrap", "views/contact.gohtml")
+	staticController := controllers.NewStaticController()
 	usersController := controllers.NewUsersController()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", home).Methods("GET")
-	r.HandleFunc("/contact", contact).Methods("GET")
+	r.Handle("/", staticController.Home).Methods("GET")
+	r.Handle("/contact", staticController.Contact).Methods("GET")
 	r.HandleFunc("/signup", usersController.New).Methods("GET")
 	r.HandleFunc("/signup", usersController.Create).Methods("POST")
-	http.ListenAndServe(":3214", r)
+	http.ListenAndServe(":3000", r)
 }

@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/schema"
 	"lenslocked.com/views"
 )
 
 func NewUsersController() *User {
 	return &User{
-		NewView: views.NewView("bootstrap", "views/users/new.gohtml"),
+		NewView: views.NewView("bootstrap", "users/new"),
 	}
 }
 
@@ -21,15 +20,12 @@ func (u *User) New(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *User) Create(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
+	var form SignupForm
+	if err := parseForm(r, &form); err != nil {
 		panic(err)
 	}
-	decoder := schema.NewDecoder()
-	form := SignupForm{}
-	if err := decoder.Decode(&form, r.PostForm); err != nil {
-		panic(err)
-	}
-	fmt.Fprintln(w, form)
+	fmt.Fprintln(w, "Email is", form.Email)
+	fmt.Fprintln(w, "Password is", form.Password)
 }
 
 type User struct {
